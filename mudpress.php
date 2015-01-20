@@ -38,6 +38,8 @@ class WP_MUDPress {
 		add_action( 'init', array( $this, 'init' ), 1 );
 		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
 
+		add_action( 'the_post', array( $this, 'display_post' ) );
+
 		add_action( 'save_post_' . self::CPT_ZONE, array( $this, 'save_zone_meta' ) );
 	}
 
@@ -113,6 +115,25 @@ class WP_MUDPress {
 			update_post_meta( $zone_id, 'movement', $_POST[ 'mudpress_movement' ] );
 		}
 	}
+
+	public function display_post( $post ) {
+
+		if ( get_post_type( $post ) == self::CPT_ZONE ) {
+
+			$movement = get_post_meta( $post->ID, 'movement', true );
+			$movement_obj = explode( ',', $movement );
+
+			if ( count( $movement_obj ) > 0 ) {
+				$append_obj = array();
+				foreach ( $movement_obj as $move ) {
+					$move = explode( ':', $move );
+					array_push( $append_obj, '<li><a href="?post_type=' . self::CPT_ZONE . '&p=' . $move[ 1 ] . '">' . $move[ 0 ] . '</a></li>' );
+				}
+				$post->post_content .= '<ul>' . implode( "\n", $append_obj ) . '</ul>';
+			}
+		}
+	}
+
 }
 
 $wp_mudpress = new WP_MUDPress();
