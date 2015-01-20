@@ -8,7 +8,6 @@
  * Author URI: http://scotchfield.com/
  * License: GPL2
  */
-
 class WP_MUDPress {
 
 	/**
@@ -16,6 +15,9 @@ class WP_MUDPress {
 	 */
 	private static $instance = null;
 
+	/**
+	 * The MUDPress domain for localization.
+	 */
 	const DOMAIN = 'mudpress';
 
 	/**
@@ -36,9 +38,12 @@ class WP_MUDPress {
 		add_action( 'init', array( $this, 'init' ), 1 );
 		add_action( 'admin_menu', array( $this, 'add_admin_menu' ) );
 
-		add_action( 'save_post', array( $this, 'save_zone_meta' ) );
+		add_action( 'save_post_' . self::CPT_ZONE, array( $this, 'save_zone_meta' ) );
 	}
 
+	/**
+	 * Initialize custom types.
+	 */
 	public function init() {
 		register_post_type(
 			self::CPT_ZONE,
@@ -63,6 +68,9 @@ class WP_MUDPress {
 		);
 	}
 
+	/**
+	 * Add menu options to the dashboard, and meta boxes to the edit pages.
+	 */
 	public function add_admin_menu() {
 		add_menu_page(
 			esc_html__( 'MUDPress', self::DOMAIN ),
@@ -85,16 +93,24 @@ class WP_MUDPress {
 
 	}
 
+	/**
+	 * Show HTML for the zone details stored in post meta.
+	 */
 	public function generate_zone_meta( $zone ) {
 		$zone_id = intval( $zone->ID );
+		$zone_movement = esc_html( get_post_meta( $zone->ID, 'movement', true ) );
 ?>
 <p><b>Zone ID</b>: <?php echo( $zone_id ); ?></p>
+<p><b>Movement</b>: <input type="text" name="mudpress_movement" value="<?php echo( $zone_movement ); ?>"></p>
 <?php
 	}
 
-	public function save_zone_meta( $zone ) {
-		if ( self::CPT_ZONE == $zone->post_type ) {
-			// update post meta
+	/**
+	 * Extract the zone updates from $_POST and save in post meta.
+	 */
+	public function save_zone_meta( $zone_id ) {
+		if ( isset( $_POST[ 'mudpress_movement' ] ) ) {
+			update_post_meta( $zone_id, 'movement', $_POST[ 'mudpress_movement' ] );
 		}
 	}
 }
