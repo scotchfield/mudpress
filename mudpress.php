@@ -26,6 +26,11 @@ class WP_MUDPress {
 	const CPT_ZONE = 'mudpress-zone';
 
 	/**
+	 * The custom post type string for zones.
+	 */
+	const TAXONOMY_ZONE_TYPE = 'mudpress-zone-type';
+
+	/**
 	 * Instantiate, if necessary, and add hooks.
 	 */
 	public function __construct() {
@@ -68,6 +73,42 @@ class WP_MUDPress {
 				'rewrite' => true,
 			)
 		);
+
+		register_taxonomy(
+			self::TAXONOMY_ZONE_TYPE,
+			self::CPT_ZONE,
+			array(
+				'label' => esc_html__( 'Zone Types', self::DOMAIN ),
+				'labels' => array(
+					'name' =>          esc_html__( 'Zone Types',          self::DOMAIN ),
+					'singular_name' => esc_html__( 'Zone Type',           self::DOMAIN ),
+					'all_items' =>     esc_html__( 'All Zone Types',      self::DOMAIN ),
+					'edit_item' =>     esc_html__( 'Edit Zone Type',      self::DOMAIN ),
+					'view_item' =>     esc_html__( 'View Zone Type',      self::DOMAIN ),
+					'update_item' =>   esc_html__( 'Update Zone Type',    self::DOMAIN ),
+					'add_new_item' =>  esc_html__( 'Add New Zone Type',   self::DOMAIN ),
+					'new_item_name' => esc_html__( 'New Zone Type Name',  self::DOMAIN ),
+					'search_items' =>  esc_html__( 'Search Zone Types',   self::DOMAIN ),
+					'popular_items' => esc_html__( 'Popular Zone Types',  self::DOMAIN ),
+					'not_found' =>     esc_html__( 'No Zone Types Found', self::DOMAIN ),
+					// todo: complete
+				),
+				'public' => true,
+				'show_ui' => true,
+				'show_in_nav_menus' => false,
+			)
+		);
+
+		// todo: move 'standard' to const, prep for store, combat, etc.
+		if ( ! term_exists( 'standard', self::TAXONOMY_ZONE_TYPE ) ) {
+			wp_insert_term(
+				'standard',
+				self::TAXONOMY_ZONE_TYPE,
+				array(
+					'description' => esc_html__( 'Regular navigation zones with a description.', self::DOMAIN ),
+				)
+			);
+		}
 	}
 
 	/**
