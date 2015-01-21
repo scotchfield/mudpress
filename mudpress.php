@@ -31,6 +31,13 @@ class WP_MUDPress {
 	const TAXONOMY_ZONE_TYPE = 'mudpress-zone-type';
 
 	/**
+	 * Possible types that a zone may exhibit, non-exclusive (taxonomy terms)
+	 */
+	const ZONE_TYPE_DESCRIPTION = 'description',
+	      ZONE_TYPE_STORE       = 'store',
+	      ZONE_TYPE_COMBAT      = 'combat';
+
+	/**
 	 * Instantiate, if necessary, and add hooks.
 	 */
 	public function __construct() {
@@ -99,16 +106,34 @@ class WP_MUDPress {
 			)
 		);
 
-		// todo: move 'standard' to const, prep for store, combat, etc.
-		if ( ! term_exists( 'standard', self::TAXONOMY_ZONE_TYPE ) ) {
+		if ( ! term_exists( self::ZONE_TYPE_DESCRIPTION, self::TAXONOMY_ZONE_TYPE ) ) {
 			wp_insert_term(
-				'standard',
+				self::ZONE_TYPE_DESCRIPTION,
 				self::TAXONOMY_ZONE_TYPE,
 				array(
-					'description' => esc_html__( 'Regular navigation zones with a description.', self::DOMAIN ),
+					'description' => esc_html__( 'Typical navigation zones with a description and navigation links.', self::DOMAIN ),
 				)
 			);
 		}
+		if ( ! term_exists( self::ZONE_TYPE_STORE, self::TAXONOMY_ZONE_TYPE ) ) {
+			wp_insert_term(
+				self::ZONE_TYPE_STORE,
+				self::TAXONOMY_ZONE_TYPE,
+				array(
+					'description' => esc_html__( 'Stores that may buy and sell items from characters.', self::DOMAIN ),
+				)
+			);
+		}
+		if ( ! term_exists( self::ZONE_TYPE_COMBAT, self::TAXONOMY_ZONE_TYPE ) ) {
+			wp_insert_term(
+				self::ZONE_TYPE_COMBAT,
+				self::TAXONOMY_ZONE_TYPE,
+				array(
+					'description' => esc_html__( 'Zones where combat can occur.', self::DOMAIN ),
+				)
+			);
+		}
+
 	}
 
 	/**
