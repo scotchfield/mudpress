@@ -37,6 +37,12 @@ class WP_MUDPress {
 	      ZONE_TYPE_STORE       = 'store',
 	      ZONE_TYPE_COMBAT      = 'combat';
 
+	private $default_meta = array(
+		'health' => 100,
+		'health_max' => 100,
+		'armour_head' => array(),
+	);
+
 	/**
 	 * Instantiate, if necessary, and add hooks.
 	 */
@@ -53,6 +59,8 @@ class WP_MUDPress {
 		add_action( 'the_post', array( $this, 'display_post' ) );
 
 		add_action( 'save_post_' . self::CPT_ZONE, array( $this, 'save_zone_meta' ) );
+
+		add_shortcode( 'mudpress_profile', array( $this, 'show_profile' ) );
 	}
 
 	/**
@@ -134,6 +142,25 @@ class WP_MUDPress {
 			);
 		}
 
+		$this->user_id = get_current_user_id();
+		if ( 0 != $this->user_id ) {
+
+			$this->user_meta = get_user_meta( $user_id, 'mudpress_user_meta' );
+
+			$changed_meta = false;
+			foreach ( $this->default_meta as $k => $v ) {
+				if ( ! isset( $this->user_meta[ $k ] ) ) {
+					$this->user_meta[ $k ] = $v;
+					$changed_meta = true;
+				}
+			}
+
+			if ( $changed_meta ) {
+				update_user_meta( $user_id, 'mudpress_user_data', $this->user_meta );
+			}
+
+		}
+
 	}
 
 	/**
@@ -198,6 +225,24 @@ class WP_MUDPress {
 				$post->post_content .= '<ul>' . implode( "\n", $append_obj ) . '</ul>';
 			}
 		}
+
+	}
+
+	public function show_profile( $atts ) {
+		if ( ! isset( $this->user_meta ) ) {
+			return '';
+		}
+
+		$st = '<div class="mudpress_profile"><h3>Profile for ' .
+			esc_html( get_user_meta( $this->user_id, 'nickname', true ) ) .
+			'</h3><ul><li>Health: ' . $this->user_meta[ 'health' ] . ' / ' .
+			$this->user_meta[ 'health_max' ] . '</li>';
+		$st = $st . '<li>Helm: </li>';
+		$st = $st . '</ul></div>';
+
+		print_r( $this->user_meta );
+
+		return $st;
 	}
 
 }
