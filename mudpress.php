@@ -145,7 +145,7 @@ class WP_MUDPress {
 		$this->user_id = get_current_user_id();
 		if ( 0 != $this->user_id ) {
 
-			$this->user_meta = get_user_meta( $user_id, 'mudpress_user_meta' );
+			$this->user_meta = get_user_meta( $this->user_id, 'mudpress_user_meta' );
 
 			$changed_meta = false;
 			foreach ( $this->default_meta as $k => $v ) {
@@ -156,7 +156,7 @@ class WP_MUDPress {
 			}
 
 			if ( $changed_meta ) {
-				update_user_meta( $user_id, 'mudpress_user_data', $this->user_meta );
+				update_user_meta( $this->user_id, 'mudpress_user_data', $this->user_meta );
 			}
 
 		}
